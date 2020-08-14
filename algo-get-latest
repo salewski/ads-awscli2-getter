@@ -44,9 +44,9 @@ fi
 # download the file, but the file's timestamp will reflect the upstream
 # timestamp (-R).
 #
+declare -r t_awscli_url='https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip'
 set -x
-curl -R -o "${t_output_fname}" \
-     'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip'
+curl -R -o "${t_output_fname}" "${t_awscli_url}"
 t_estat=$?
 set +x
 if test $t_estat -ne 0; then
@@ -54,8 +54,18 @@ if test $t_estat -ne 0; then
     exit 1
 fi
 
+set -x
+curl -R -o "${t_output_fname}.sig" "${t_awscli_url}.sig"
+t_estat=$?
+set +x
+if test $t_estat -ne 0; then
+    printf "${PROG} (error): was error while fetching the remote sig file; bailing out\n" 1>&2
+    exit 1
+fi
+
 if $BE_VERBOSE; then
-    printf "${PROG} (info): saved file as: %s\n" "${t_output_fname}" 1>&2
+    printf "${PROG} (info): saved file as: %s\n" "${t_output_fname}"     1>&2
+    printf "${PROG} (info): saved sig  as: %s\n" "${t_output_fname}.sig" 1>&2
 
     # The 'install' script provides a few options, among them a '-i'
     # (--install-dir) opt that says where to place everything, and a '-b'
@@ -85,7 +95,9 @@ if $BE_VERBOSE; then
     cat <<EOF 1>&2
 
 HINT:
-    $ chmod a-w '${t_output_fname}'
+    $ chmod a-w '${t_output_fname}'{,.sig}
+
+    $ gpg --verify '${t_output_fname}'{.sig,}
 
     $ set -x
 
