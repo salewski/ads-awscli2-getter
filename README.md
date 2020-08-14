@@ -18,7 +18,7 @@ he does things. It is geared toward the long-term maintainability of the
 system rather than getting the tool installed as quickly as possible.
 
 
-# Q: Do I need this tool?
+### Q: Do I need this tool?
 
 **A:** Almost certainly not. The `awscli2` installer comes with instructions
 that will probably work well enough for most folks; no need to complicate
