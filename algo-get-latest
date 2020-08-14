@@ -1,0 +1,106 @@
+#!/bin/bash -
+# SPDX-FileCopyrightText: <text> © 2020 Alan D. Salewski <salewski@att.net> </text>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+# algo-get-latest: Knows where to retrieve the latest awscli2 installer;
+# downloads it, and then prints a hint about what to do next.
+#
+# Note that the hint reflects my personal setup, tailored for the way I do
+# things. This is geared toward the long-term maintainability of the system
+# rather than getting the tool installed as quickly as possible.
+#
+declare -r PROG='algo-get-latest'
+
+#BE_VERBOSE=false
+BE_VERBOSE=true
+
+# These instructions are an adaptation of those from
+# the manual "AWS Command Line Reference", in the section
+# "Install the AWS CLI version 2 on Linux":
+#
+#     https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html
+#
+# Pristine instructions:
+#     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+#     unzip awscliv2.zip
+#     sudo ./aws/install
+
+t_dt_token=$(date '+%F_%H%M%S')
+
+# NOTE: The default name of the remote file is 'awscli-exe-linux-x86_64.zip'
+#       We use a variation of that file name (with our date token added to
+#       it) and also incorporate the 'awscliv2*' name suggested by the upstream
+#       instructions.
+#
+t_output_fname="awscliv2-exe-linux-x86_64-${t_dt_token}.zip"
+
+if test -e "${t_output_fname}"; then
+    printf "${PROG} (error): file already exists; will not overwrite: %s; bailing out\n" "${t_output_fname}" 1>&2
+    exit 1
+fi
+
+# Note that our file will be named with the date and time at which we
+# download the file, but the file's timestamp will reflect the upstream
+# timestamp (-R).
+#
+set -x
+curl -R -o "${t_output_fname}" \
+     'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip'
+t_estat=$?
+set +x
+if test $t_estat -ne 0; then
+    printf "${PROG} (error): was error while fetching the remote file; bailing out\n" 1>&2
+    exit 1
+fi
+
+if $BE_VERBOSE; then
+    printf "${PROG} (info): saved file as: %s\n" "${t_output_fname}" 1>&2
+
+    # The 'install' script provides a few options, among them a '-i'
+    # (--install-dir) opt that says where to place everything, and a '-b'
+    # (--bin-dir) opt that will have two symlinks created in it that point
+    # into the (deep) locations beneath the install dir in which the 'aws' and
+    # 'aws_completer' programs live. According to the comments in the
+    # 'README.md' file, it is intended for use beneath ~/.local/bin or
+    # similar.
+    #
+    # Here, we're abusing it a bit to put things the way I would expect them
+    # to be. In particular, I would expect programs, by default, to be placed
+    # in a 'bin' subdirectory of the installation prefix. Happily, the
+    # 'install' script will create both the '-i' and '-b' directories, if
+    # needed, and will not balk at the latter being beneath the former -- so
+    # below I set the bin dir that way. The effect is that the 'install'
+    # script places the artifacts in the installation prefix, and then creates
+    # a 'bin' subdir beneath it into which it then places the two symlinks.
+    #
+    #     $ readlink -f ~/local/awscli2-2020-08-13_210626/bin/aws
+    #     /home/someuser/local/awscli2-2020-08-13_210626/v2/2.0.40/dist/aws
+    #
+    # This arrangement allows me to keep everything self-contained beneath the
+    # install prefix, and also manage my own '~/local/awscli2' symlink
+    # pointing to the versioned subdir. That makes integrating into my shell
+    # setup a snap.
+
+    cat <<EOF 1>&2
+
+HINT:
+    $ chmod a-w '${t_output_fname}'
+
+    $ set -x
+
+    $ pfx="\${HOME}/local/awscli2-${t_dt_token}"
+
+    $ mkdir tt && ( cd tt && unzip -q "../${t_output_fname}" && cd 'aws' && ./install --install-dir "\${pfx}" --bin-dir "\${pfx}/bin" ) && rm -fr './tt/aws' && rmdir tt
+
+    $ set +x
+
+    $ unset pfx
+
+EOF
+fi
+
+# We'll leave it to the user to extract and install it.
+
+#unzip awscliv2.zip
+#sudo ./aws/install
