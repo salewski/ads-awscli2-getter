@@ -85,8 +85,8 @@ if $BE_VERBOSE; then
     # script places the artifacts in the installation prefix, and then creates
     # a 'bin' subdir beneath it into which it then places the two symlinks.
     #
-    #     $ readlink -f ~/local/awscli2-2020-08-13_210626/bin/aws
-    #     /home/someuser/local/awscli2-2020-08-13_210626/v2/2.0.40/dist/aws
+    #     $ readlink -f ~/local/awscli2-2024-10-09_162422/bin/aws
+    #     /home/someuser/local/awscli2-2024-10-09_162422/v2/2.18.3/dist/aws
     #
     # This arrangement allows me to keep everything self-contained beneath the
     # install prefix, and also manage my own '~/local/awscli2' symlink
