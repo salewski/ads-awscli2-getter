@@ -40,9 +40,10 @@ if test -e "${t_output_fname}"; then
     exit 1
 fi
 
-# Note that our file will be named with the date and time at which we
-# download the file, but the file's timestamp will reflect the upstream
-# timestamp (-R).
+# Note that our file will be named with the date and time at which we download
+# it, but the file's ctime (creation time) timestamp in the file system will
+# reflect (if available) the time supplied by the remote upstream system from
+# which we are downloading it (-R).
 #
 declare -r t_awscli_url='https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip'
 set -x
