@@ -38,7 +38,7 @@ t_dt_token=$(date '+%F_%H%M%S')
 t_output_fname="awscliv2-exe-linux-x86_64-${t_dt_token}.zip"
 
 if test -e "${t_output_fname}"; then
-    printf "${prog} (error): file already exists; will not overwrite: %s; bailing out\n" "${t_output_fname}" 1>&2
+    printf '%s (error): file already exists; will not overwrite: %s; bailing out\n' "${prog}" "${t_output_fname}" 1>&2
     exit 1
 fi
 
@@ -53,7 +53,7 @@ curl -R -o "${t_output_fname}" "${t_awscli_url}"
 t_estat=$?
 set +x
 if test $t_estat -ne 0; then
-    printf "${prog} (error): was error while fetching the remote file; bailing out\n" 1>&2
+    printf '%s (error): was error while fetching the remote file; bailing out\n' "${prog}" 1>&2
     exit 1
 fi
 
@@ -62,13 +62,13 @@ curl -R -o "${t_output_fname}.sig" "${t_awscli_url}.sig"
 t_estat=$?
 set +x
 if test $t_estat -ne 0; then
-    printf "${prog} (error): was error while fetching the remote sig file; bailing out\n" 1>&2
+    printf '%s (error): was error while fetching the remote sig file; bailing out\n' "${prog}" 1>&2
     exit 1
 fi
 
 if $be_verbose; then
-    printf "${prog} (info): saved file as: %s\n" "${t_output_fname}"     1>&2
-    printf "${prog} (info): saved sig  as: %s\n" "${t_output_fname}.sig" 1>&2
+    printf '%s (info): saved file as: %s\n' "${prog}" "${t_output_fname}"     1>&2
+    printf '%s (info): saved sig  as: %s\n' "${prog}" "${t_output_fname}.sig" 1>&2
 
     # The 'install' script provides a few options, among them a '-i'
     # (--install-dir) opt that says where to place everything, and a '-b'
