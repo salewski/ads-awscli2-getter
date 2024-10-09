@@ -1,5 +1,7 @@
 #!/bin/bash -
-# SPDX-FileCopyrightText: <text> © 2020 Alan D. Salewski <salewski@att.net> </text>
+# SPDX-FileCopyrightText: <text>
+#     © 2020, 2024 Alan D. Salewski <ads@salewski.email>
+# </text>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
